@@ -69,12 +69,85 @@ body {
   min-height: 180px;
 }
 
-.timer-placeholder {
+.timer-display {
   font-size: 56px;
   font-weight: 300;
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.04em;
-  color: rgba(232, 237, 242, 0.35);
+  color: #e8edf2;
+  transition: color 0.3s ease;
+}
+
+.timer-display.running {
+  color: #7db3ff;
+  text-shadow: 0 0 24px rgba(125, 179, 255, 0.25);
+}
+
+.timer-status {
+  margin-top: 8px;
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(232, 237, 242, 0.4);
+}
+
+.session-controls {
+  width: 100%;
+  display: flex;
+  gap: 12px;
+}
+
+.btn {
+  flex: 1;
+  padding: 12px 0;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.1s ease;
+}
+
+.btn:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.btn-primary {
+  flex: 2;
+  color: #0b0f14;
+  background: #7db3ff;
+  border-color: transparent;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: #93c1ff;
+}
+
+.btn-primary.running {
+  background: rgba(125, 179, 255, 0.14);
+  color: #7db3ff;
+  border-color: rgba(125, 179, 255, 0.4);
+}
+
+.btn-primary.running:hover {
+  background: rgba(125, 179, 255, 0.22);
+}
+
+.btn-secondary {
+  color: rgba(232, 237, 242, 0.8);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.12);
 }
 
 .controls-card,
