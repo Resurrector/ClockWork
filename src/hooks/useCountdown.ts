@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 export type CountdownStatus = "idle" | "running" | "paused";
 
 const TICK_INTERVAL_MS = 250;
+export const MAX_DURATION_MS = 24 * 60 * 60 * 1000;
 
 /**
  * Timestamp-based countdown. Elapsed time is derived from wall-clock
@@ -50,6 +51,45 @@ export function useCountdown(initialDurationMs = 5 * 60 * 1000) {
     setRemainingMs(durationMs);
   }, [durationMs]);
 
+  /**
+   * Shifts the remaining time by `deltaMs` without pausing. While
+   * running this just moves `endsAt`; while paused/idle it changes
+   * the stored remaining time. Clamps to [0, MAX_DURATION_MS]; hitting
+   * zero finishes the session.
+   */
+  const adjust = useCallback((deltaMs: number) => {
+    if (statusRef.current === "running" && endsAtRef.current !== null) {
+      const newRemaining = endsAtRef.current - Date.now() + deltaMs;
+      if (newRemaining <= 0) {
+        endsAtRef.current = null;
+        remainingRef.current = 0;
+        setRemainingMs(0);
+        setStatus("idle");
+        return;
+      }
+      const clamped = Math.min(newRemaining, MAX_DURATION_MS);
+      endsAtRef.current = Date.now() + clamped;
+      remainingRef.current = clamped;
+      setRemainingMs(clamped);
+      return;
+    }
+
+    // idle or paused: adjust the stored remaining time
+    const newRemaining = Math.min(
+      Math.max(0, remainingRef.current + deltaMs),
+      MAX_DURATION_MS,
+    );
+    remainingRef.current = newRemaining;
+    setRemainingMs(newRemaining);
+    if (newRemaining === 0) {
+      endsAtRef.current = null;
+      setStatus("idle");
+    } else if (statusRef.current === "idle") {
+      // never started (or finished): keep reset() consistent
+      setDurationMs(newRemaining);
+    }
+  }, []);
+
   useEffect(() => {
     if (status !== "running") return;
     const tick = () => {
@@ -65,5 +105,5 @@ export function useCountdown(initialDurationMs = 5 * 60 * 1000) {
     return () => clearInterval(interval);
   }, [status]);
 
-  return { status, remainingMs, durationMs, start, pause, resume, reset };
+  return { status, remainingMs, durationMs, start, pause, resume, reset, adjust };
 }

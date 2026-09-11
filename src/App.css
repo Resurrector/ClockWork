@@ -154,3 +154,140 @@ body {
 .presets-card {
   min-height: 96px;
 }
+
+.adjust-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.segment {
+  flex: 1;
+  display: flex;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 10px;
+  padding: 3px;
+  gap: 3px;
+}
+
+.segment-btn {
+  flex: 1;
+  padding: 7px 0;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: rgba(232, 237, 242, 0.55);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.segment-btn:hover {
+  color: rgba(232, 237, 242, 0.85);
+}
+
+.segment-btn.selected {
+  background: rgba(125, 179, 255, 0.18);
+  color: #7db3ff;
+}
+
+.adjust-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-adjust {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.06);
+  color: #e8edf2;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.btn-adjust:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.btn-adjust:active {
+  transform: scale(0.92);
+}
+
+/* Phone-style spinning wheel picker */
+.wheel-picker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 14px;
+}
+
+.wheel-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.wheel-label {
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(232, 237, 242, 0.35);
+  margin-bottom: 2px;
+}
+
+.wheel-scroll {
+  overflow-y: scroll;
+  scroll-snap-type: y mandatory;
+  scrollbar-width: none;
+  mask-image: linear-gradient(
+    to bottom,
+    transparent,
+    black 30%,
+    black 70%,
+    transparent
+  );
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent,
+    black 30%,
+    black 70%,
+    transparent
+  );
+}
+
+.wheel-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.wheel-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  font-size: 20px;
+  font-variant-numeric: tabular-nums;
+  color: rgba(232, 237, 242, 0.35);
+  cursor: pointer;
+  scroll-snap-align: center;
+  transition: color 0.15s ease;
+}
+
+.wheel-item.selected {
+  color: #7db3ff;
+  font-weight: 600;
+}
+
+.wheel-separator {
+  margin-top: 18px;
+  font-size: 20px;
+  color: rgba(232, 237, 242, 0.4);
+}
