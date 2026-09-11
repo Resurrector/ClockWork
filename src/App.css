@@ -25,8 +25,10 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 24px 20px;
-  gap: 20px;
+  padding: 16px 20px;
+  gap: 10px;
+  overflow-y: auto;
+  scrollbar-width: thin;
 
   color: #e8edf2;
   background-color: #0b0f14;
@@ -61,26 +63,90 @@ body {
 }
 
 .timer-card {
-  flex: 1;
+  flex: 0 0 auto;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 180px;
+  padding: 12px 18px;
 }
 
+/* Circular progress ring surrounding the countdown text. The progress
+   circle is rotated -90deg so it starts at 12 o'clock; stroke-dashoffset
+   is driven from App as elapsed/duration and CSS transitions smooth the
+   250ms ticks into continuous motion. */
 .timer-display {
-  font-size: 56px;
+  position: relative;
+  width: 180px;
+  height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.timer-ring {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.timer-ring-track {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.08);
+  stroke-width: 8;
+}
+
+.timer-ring-progress {
+  fill: none;
+  stroke: #7db3ff;
+  stroke-width: 8;
+  stroke-linecap: round;
+  transition:
+    stroke-dashoffset 0.3s linear,
+    stroke 0.3s ease;
+  filter: drop-shadow(0 0 6px rgba(125, 179, 255, 0.35));
+}
+
+.timer-time {
+  font-size: 40px;
   font-weight: 300;
   font-variant-numeric: tabular-nums;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.03em;
   color: #e8edf2;
-  transition: color 0.3s ease;
+  transition: color 0.3s ease, text-shadow 0.3s ease;
 }
 
-.timer-display.running {
+.timer-display.running .timer-time {
   color: #7db3ff;
   text-shadow: 0 0 24px rgba(125, 179, 255, 0.25);
+}
+
+/* Completion: warm accent ring, gentle glow pulse on the whole display.
+   Stays active until Start/Reset changes the status. */
+.timer-display.finished .timer-ring-progress {
+  stroke: #ffc46b;
+  filter: drop-shadow(0 0 8px rgba(255, 196, 107, 0.45));
+}
+
+.timer-display.finished .timer-time {
+  color: #ffc46b;
+  text-shadow: 0 0 24px rgba(255, 196, 107, 0.3);
+  animation: finished-pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes finished-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    text-shadow: 0 0 18px rgba(255, 196, 107, 0.25);
+  }
+  50% {
+    transform: scale(1.05);
+    text-shadow: 0 0 30px rgba(255, 196, 107, 0.5);
+  }
 }
 
 .timer-status {
@@ -155,6 +221,239 @@ body {
   min-height: 96px;
 }
 
+.controls-card {
+  min-height: 0;
+  flex-shrink: 0;
+}
+
+.presets-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.presets-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.presets-title {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: rgba(232, 237, 242, 0.45);
+}
+
+.presets-add {
+  border: none;
+  background: transparent;
+  color: #7db3ff;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 6px;
+  transition: background 0.2s ease;
+}
+
+.presets-add:hover:not(:disabled) {
+  background: rgba(125, 179, 255, 0.12);
+}
+
+.presets-add:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.presets-empty {
+  padding: 10px 4px;
+  font-size: 12px;
+  color: rgba(232, 237, 242, 0.35);
+  text-align: center;
+}
+
+.preset-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  overflow-y: auto;
+  /* Only the list is height-capped; the card itself grows to contain
+     the header, list, and the add/edit form. */
+  max-height: 120px;
+  /* Scrollable but visually scrollbar-free */
+  scrollbar-width: none;
+}
+
+.preset-list::-webkit-scrollbar {
+  display: none;
+}
+
+.preset-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 6px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.preset-load {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 6px 8px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  font-family: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  text-align: left;
+}
+
+.preset-load:hover {
+  background: rgba(125, 179, 255, 0.1);
+}
+
+.preset-name {
+  color: rgba(232, 237, 242, 0.85);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.preset-duration {
+  font-variant-numeric: tabular-nums;
+  color: #7db3ff;
+  font-weight: 600;
+}
+
+.preset-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.preset-action {
+  border: none;
+  background: transparent;
+  color: rgba(232, 237, 242, 0.45);
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 6px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.preset-action:hover {
+  color: rgba(232, 237, 242, 0.9);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.preset-action.danger {
+  color: #ff8a8a;
+}
+
+.preset-action.danger:hover {
+  background: rgba(255, 100, 100, 0.14);
+}
+
+.preset-confirm {
+  font-size: 11px;
+  color: rgba(232, 237, 242, 0.55);
+  padding-right: 2px;
+}
+
+/* Shared add/edit form (inline inside the presets card) */
+.preset-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.preset-input,
+.preset-field input {
+  width: 100%;
+  padding: 7px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(0, 0, 0, 0.25);
+  color: #e8edf2;
+  font-family: inherit;
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.preset-input:focus,
+.preset-field input:focus {
+  border-color: rgba(125, 179, 255, 0.5);
+}
+
+/* hide number input spinners for a cleaner look */
+.preset-field input::-webkit-outer-spin-button,
+.preset-field input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.preset-field input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.preset-form-row {
+  display: flex;
+  gap: 8px;
+}
+
+.preset-field {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: rgba(232, 237, 242, 0.4);
+}
+
+.preset-error {
+  font-size: 12px;
+  color: #ff9d9d;
+}
+
+.preset-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.btn-small {
+  flex: none;
+  padding: 7px 16px;
+  font-size: 12px;
+}
+
 .adjust-row {
   display: flex;
   align-items: center;
@@ -221,13 +520,34 @@ body {
   transform: scale(0.92);
 }
 
-/* Phone-style spinning wheel picker */
+/* Phone-style wheel picker — fully controlled, no scroll containers.
+   Geometry: 18px label row + 3 x 40px rows. The selected value is the
+   physical middle row by layout, so it never moves visually. */
 .wheel-picker {
+  --wheel-label-h: 18px;
+  --wheel-item-h: 40px;
+
+  position: relative;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
-  gap: 6px;
-  margin-top: 14px;
+  gap: 4px;
+  margin-top: 10px;
+  flex-shrink: 0;
+}
+
+/* Highlight band behind the middle (selected) row, spanning both columns. */
+.wheel-band {
+  position: absolute;
+  top: calc(var(--wheel-label-h) + var(--wheel-item-h));
+  left: 50%;
+  transform: translateX(-50%);
+  height: var(--wheel-item-h);
+  width: 136px;
+  background: rgba(125, 179, 255, 0.08);
+  border: 1px solid rgba(125, 179, 255, 0.22);
+  border-radius: 10px;
+  pointer-events: none;
 }
 
 .wheel-column {
@@ -237,57 +557,83 @@ body {
 }
 
 .wheel-label {
+  height: var(--wheel-label-h);
+  line-height: var(--wheel-label-h);
   font-size: 10px;
   letter-spacing: 0.2em;
   text-transform: uppercase;
   color: rgba(232, 237, 242, 0.35);
-  margin-bottom: 2px;
 }
 
-.wheel-scroll {
-  overflow-y: scroll;
-  scroll-snap-type: y mandatory;
-  scrollbar-width: none;
-  mask-image: linear-gradient(
-    to bottom,
-    transparent,
-    black 30%,
-    black 70%,
-    transparent
-  );
-  -webkit-mask-image: linear-gradient(
-    to bottom,
-    transparent,
-    black 30%,
-    black 70%,
-    transparent
-  );
+.wheel-rows {
+  width: 56px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  touch-action: none;
+  user-select: none;
+  outline: none;
+  border-radius: 10px;
 }
 
-.wheel-scroll::-webkit-scrollbar {
-  display: none;
+.wheel-rows:focus-visible {
+  box-shadow: 0 0 0 1px rgba(125, 179, 255, 0.4);
 }
 
-.wheel-item {
+.wheel-cell {
+  flex: 0 0 var(--wheel-item-h);
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 56px;
   font-size: 20px;
   font-variant-numeric: tabular-nums;
   color: rgba(232, 237, 242, 0.35);
   cursor: pointer;
-  scroll-snap-align: center;
-  transition: color 0.15s ease;
 }
 
-.wheel-item.selected {
+.wheel-cell.selected {
   color: #7db3ff;
   font-weight: 600;
+  cursor: default;
 }
 
-.wheel-separator {
-  margin-top: 18px;
+/* Slide-in animation for changing values. Each value <span> is keyed by
+   its number, so React remounts it on every change and the animation
+   replays. Direction (dir) picks whether values appear to slide up or
+   down. 130ms, cosmetic only - it never delays input. */
+.wheel-value {
+  display: inline-block;
+  animation: wheel-slide 130ms ease;
+}
+
+.wheel-value.from-below {
+  --wheel-slide-from: 10px;
+}
+
+.wheel-value.from-above {
+  --wheel-slide-from: -10px;
+}
+
+@keyframes wheel-slide {
+  from {
+    opacity: 0.35;
+    transform: translateY(var(--wheel-slide-from, 10px));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Colon sits in its own column, offset past the label row and centered
+   on the middle row, so it always aligns with the selected values. */
+.wheel-colon {
+  margin-top: calc(var(--wheel-label-h) + var(--wheel-item-h));
+  height: var(--wheel-item-h);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-size: 20px;
-  color: rgba(232, 237, 242, 0.4);
+  color: rgba(232, 237, 242, 0.6);
+  pointer-events: none;
 }

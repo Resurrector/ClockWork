@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
-export type CountdownStatus = "idle" | "running" | "paused";
+export type CountdownStatus = "idle" | "running" | "paused" | "finished";
 
 const TICK_INTERVAL_MS = 250;
 export const MAX_DURATION_MS = 24 * 60 * 60 * 1000;
@@ -18,15 +18,25 @@ export function useCountdown(initialDurationMs = 5 * 60 * 1000) {
   const endsAtRef = useRef<number | null>(null);
   const statusRef = useRef<CountdownStatus>("idle");
   const remainingRef = useRef(initialDurationMs);
+  const durationRef = useRef(initialDurationMs);
 
   statusRef.current = status;
   remainingRef.current = remainingMs;
+  durationRef.current = durationMs;
 
-  const start = useCallback((ms: number) => {
-    const clamped = Math.max(0, ms);
-    setDurationMs(clamped);
-    setRemainingMs(clamped);
-    endsAtRef.current = Date.now() + clamped;
+  /**
+   * Starts a countdown. When `ms` is omitted, the currently displayed
+   * remaining time is used, so idle adjustments (+/-) always carry over
+   * to what Start actually counts down. (After a finish the displayed
+   * value is 0, so the last session duration is used instead.)
+   */
+  const start = useCallback((ms?: number) => {
+    const base =
+      ms ?? (remainingRef.current > 0 ? remainingRef.current : durationRef.current);
+    const duration = Math.max(0, base);
+    setDurationMs(duration);
+    setRemainingMs(duration);
+    endsAtRef.current = Date.now() + duration;
     setStatus("running");
   }, []);
 
@@ -64,7 +74,7 @@ export function useCountdown(initialDurationMs = 5 * 60 * 1000) {
         endsAtRef.current = null;
         remainingRef.current = 0;
         setRemainingMs(0);
-        setStatus("idle");
+        setStatus("finished");
         return;
       }
       const clamped = Math.min(newRemaining, MAX_DURATION_MS);
@@ -74,7 +84,7 @@ export function useCountdown(initialDurationMs = 5 * 60 * 1000) {
       return;
     }
 
-    // idle or paused: adjust the stored remaining time
+    // idle, paused, or finished: adjust the stored remaining time
     const newRemaining = Math.min(
       Math.max(0, remainingRef.current + deltaMs),
       MAX_DURATION_MS,
@@ -83,9 +93,11 @@ export function useCountdown(initialDurationMs = 5 * 60 * 1000) {
     setRemainingMs(newRemaining);
     if (newRemaining === 0) {
       endsAtRef.current = null;
-      setStatus("idle");
-    } else if (statusRef.current === "idle") {
-      // never started (or finished): keep reset() consistent
+      setStatus("finished");
+    } else if (statusRef.current === "idle" || statusRef.current === "finished") {
+      // never started (or finished): adjusting returns to Ready
+      if (statusRef.current === "finished") setStatus("idle");
+      // keep reset() consistent
       setDurationMs(newRemaining);
     }
   }, []);
@@ -98,12 +110,35 @@ export function useCountdown(initialDurationMs = 5 * 60 * 1000) {
       setRemainingMs(remaining);
       if (remaining <= 0) {
         endsAtRef.current = null;
-        setStatus("idle");
+        setStatus("finished");
       }
     };
     const interval = setInterval(tick, TICK_INTERVAL_MS);
     return () => clearInterval(interval);
   }, [status]);
 
-  return { status, remainingMs, durationMs, start, pause, resume, reset, adjust };
+  /**
+   * Stops any countdown (running or paused) and loads `ms` as the new
+   * session duration in the idle state, ready for Start.
+   */
+  const load = useCallback((ms: number) => {
+    const clamped = Math.min(Math.max(0, ms), MAX_DURATION_MS);
+    endsAtRef.current = null;
+    remainingRef.current = clamped;
+    setRemainingMs(clamped);
+    setDurationMs(clamped);
+    setStatus("idle");
+  }, []);
+
+  return {
+    status,
+    remainingMs,
+    durationMs,
+    start,
+    pause,
+    resume,
+    reset,
+    adjust,
+    load,
+  };
 }
