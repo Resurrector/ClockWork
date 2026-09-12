@@ -103,6 +103,7 @@ body {
   width: 100%;
   height: 100%;
   transform: rotate(-90deg);
+  overflow: visible;
 }
 
 .timer-ring-track {
@@ -114,12 +115,15 @@ body {
 .timer-ring-progress {
   fill: none;
   stroke: #7db3ff;
-  stroke-width: 8;
+  stroke-width: 6;
   stroke-linecap: round;
   transition:
     stroke-dashoffset 0.3s linear,
     stroke 0.3s ease;
-  filter: drop-shadow(0 0 6px rgba(125, 179, 255, 0.35));
+  filter: drop-shadow(0 0 2px rgba(125, 179, 255, 0.1))
+    drop-shadow(0 0 4px rgba(125, 179, 255, 0.1))
+    drop-shadow(0 0 6px rgba(125, 179, 255, 0.1))
+    drop-shadow(0 0 8px rgba(125, 179, 255, 0.1));
 }
 
 .timer-time {
