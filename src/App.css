@@ -28,13 +28,25 @@ body {
   padding: 16px 20px;
   gap: 10px;
   overflow-y: auto;
-  scrollbar-width: thin;
+  scrollbar-width: none;
 
   color: #e8edf2;
   background-color: #0b0f14;
   background-image:
-    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(56, 120, 255, 0.16), transparent),
-    radial-gradient(ellipse 60% 40% at 80% 110%, rgba(140, 80, 255, 0.1), transparent);
+    radial-gradient(
+      ellipse 80% 50% at 50% -10%,
+      rgba(56, 120, 255, 0.16),
+      transparent
+    ),
+    radial-gradient(
+      ellipse 60% 40% at 80% 110%,
+      rgba(140, 80, 255, 0.1),
+      transparent
+    );
+}
+
+.app::-webkit-scrollbar {
+  display: none;
 }
 
 .app-header {
@@ -116,7 +128,9 @@ body {
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.03em;
   color: #e8edf2;
-  transition: color 0.3s ease, text-shadow 0.3s ease;
+  transition:
+    color 0.3s ease,
+    text-shadow 0.3s ease;
 }
 
 .timer-display.running .timer-time {
@@ -174,7 +188,10 @@ body {
   letter-spacing: 0.08em;
   text-transform: uppercase;
   cursor: pointer;
-  transition: background 0.2s ease, border-color 0.2s ease, transform 0.1s ease;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.1s ease;
 }
 
 .btn:active:not(:disabled) {
@@ -357,7 +374,9 @@ body {
   padding: 4px 6px;
   border-radius: 6px;
   cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
 }
 
 .preset-action:hover {
@@ -481,7 +500,9 @@ body {
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s ease, color 0.2s ease;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
 }
 
 .segment-btn:hover {
@@ -509,7 +530,9 @@ body {
   font-weight: 500;
   line-height: 1;
   cursor: pointer;
-  transition: background 0.2s ease, transform 0.1s ease;
+  transition:
+    background 0.2s ease,
+    transform 0.1s ease;
 }
 
 .btn-adjust:hover {
