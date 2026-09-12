@@ -303,7 +303,7 @@ body {
   overflow-y: auto;
   /* Only the list is height-capped; the card itself grows to contain
      the header, list, and the add/edit form. */
-  max-height: 120px;
+  max-height: 129.6px;
   /* Scrollable but visually scrollbar-free */
   scrollbar-width: none;
 }
